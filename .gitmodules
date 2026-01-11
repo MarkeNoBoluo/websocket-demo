@@ -1,0 +1,3 @@
+[submodule "third_parity/websocketpp"]
+	path = third_parity/websocketpp
+	url = git@github.com:zaphoyd/websocketpp.git

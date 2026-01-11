@@ -7,7 +7,7 @@
 #include <set>
 #include <functional>
 
-namespace ws::server {
+namespace KK_WS::server {
 
 using server_t = websocketpp::server<websocketpp::config::asio>;
 using connection_hdl = websocketpp::connection_hdl;
@@ -96,4 +96,4 @@ private:
     mutable std::mutex connections_mutex_;
 };
 
-} // namespace ws::server
+} // namespace KK_WS::server

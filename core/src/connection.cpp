@@ -6,7 +6,7 @@
 #include <thread>
 #include <atomic>
 
-namespace ws::core {
+namespace KK_WS::core {
 
 using client_t = websocketpp::client<websocketpp::config::asio>;
 using connection_hdl = websocketpp::connection_hdl;
@@ -48,17 +48,17 @@ public:
         disconnect();
     }
 
-    void connect() {
+    bool connect(const ws_config& config) {
         if (state_ == ws_connection_state::WS_CONNECTED || 
             state_ == ws_connection_state::WS_CONNECTING) {
             Logger::warning("已经连接或正在连接中");
-            return;
+            return false;
         }
 
         if (!config_.validate()) {
             Logger::error("WebSocket配置无效");
             notify_error("配置无效");
-            return;
+            return false;
         }
 
         try {
@@ -72,7 +72,7 @@ public:
                 Logger::error("创建连接失败: " + ec.message());
                 state_ = ws_connection_state::WS_FAILED;
                 notify_error(ec.message());
-                return;
+                return false;
             }
 
             hdl_ = con->get_handle();
@@ -90,11 +90,13 @@ public:
             }
             
             Logger::info("正在连接到: " + config_.uri);
+            return (state_ == ws_connection_state::WS_CONNECTED);
             
         } catch (const std::exception& e) {
             Logger::error("连接异常: " + std::string(e.what()));
             state_ = ws_connection_state::WS_FAILED;
             notify_error(e.what());
+            return false;
         }
     }
 
@@ -132,10 +134,10 @@ public:
         return state_;
     }
 
-    void send_message(const ws_message& message) {
+    bool  send_message(const ws_message& message) {
         if (state_ != ws_connection_state::WS_CONNECTED) {
             Logger::warning("未连接，无法发送消息");
-            return;
+            return false;
         }
 
         try {
@@ -150,10 +152,13 @@ public:
             if (ec) {
                 Logger::error("发送消息失败: " + ec.message());
                 notify_error(ec.message());
+                return false;
             }
+            return true;
             
         } catch (const std::exception& e) {
             Logger::error("发送消息异常: " + std::string(e.what()));
+            return false;
         }
     }
 
@@ -242,8 +247,8 @@ Connection::Connection()
 
 Connection::~Connection() = default;
 
-void Connection::connect() {
-    impl_->connect();
+bool Connection::connect(const ws_config& config) {
+    return impl_->connect(config);
 }
 
 void Connection::disconnect() {
@@ -254,8 +259,8 @@ ws_connection_state Connection::get_connection_state() const {
     return impl_->get_state();
 }
 
-void Connection::send_message(const ws_message& message) {
-    impl_->send_message(message);
+bool Connection::send_message(const ws_message& message) {
+    return impl_->send_message(message);
 }
 
 void Connection::set_message_callback(MessageCallback callback) {
@@ -285,4 +290,4 @@ std::unique_ptr<IWebSocketEndpoint> create_connection(const ws_config& config) {
     return conn;
 }
 
-} // namespace ws::core
+} // namespace KK_WS::core

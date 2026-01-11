@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-namespace ws::core {
+namespace KK_WS::core {
 
 /**
  * @brief WebSocket连接实现类（Pimpl模式）
@@ -22,10 +22,10 @@ public:
     Connection& operator=(Connection&&) = delete;
 
     // IWebSocketEndpoint接口实现
-    void connect() override;
+    bool connect(const ws_config& config) override;  // 修改签名
     void disconnect() override;
     ws_connection_state get_connection_state() const override;
-    void send_message(const ws_message& message) override;
+    bool send_message(const ws_message& message) override;
     void set_message_callback(MessageCallback callback) override;
     void set_state_callback(StateCallback callback) override;
     void set_error_callback(ErrorCallback callback) override;
@@ -44,4 +44,4 @@ private:
  */
 std::unique_ptr<IWebSocketEndpoint> create_connection(const ws_config& config);
 
-} // namespace ws::core
+} // namespace KK_WS::core

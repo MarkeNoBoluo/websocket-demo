@@ -2,22 +2,27 @@
 project(ws-core LANGUAGES CXX)
 
 # 查找WebSocket++
-find_package(Websocketpp REQUIRED)
+find_path(WEBSOCKETPP_INCLUDE_DIR
+    NAMES websocketpp/version.hpp
+    HINTS
+        ${CMAKE_SOURCE_DIR}/third_party/websocketpp
+        /usr/local/include
+        /usr/include
+)
 
 if(NOT WEBSOCKETPP_INCLUDE_DIR)
-    message(FATAL_ERROR "✗ WebSocket++ 未找到！请确保 WEBSOCKETPP_ROOT (${WEBSOCKETPP_ROOT}) 指向正确的目录")
+    message(WARNING "WebSocket++ not found, please install or add to third_party/")
 endif()
 
-# 创建共享库
-add_library(ws-core SHARED
+# 创建静态库（更简单，避免 DLL 导出问题）
+add_library(ws-core STATIC
     src/connection.cpp
 )
 
 # 包含目录
 target_include_directories(ws-core
-    PUBLIC 
+    PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/ws_core>
         ${WEBSOCKETPP_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
     PRIVATE
@@ -26,11 +31,10 @@ target_include_directories(ws-core
 
 # 链接依赖
 target_link_libraries(ws-core
-    PUBLIC 
+    PUBLIC
         ws-common
         Boost::system
         Boost::thread
-        Websocketpp::Websocketpp
 )
 
 # 平台特定库
@@ -38,4 +42,4 @@ if(WIN32)
     target_link_libraries(ws-core PRIVATE ws2_32)
 endif()
 
-message(STATUS "核心库配置完成: ws-core")
+message(STATUS "✓ 核心库配置完成: ws-core (静态库)")

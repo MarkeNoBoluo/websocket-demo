@@ -1,7 +1,8 @@
+#pragma once
 #include <string>
 #include <functional>
 
-namespace ws{ // 创建websockets的命名空间
+namespace KK_WS { // 创建websockets的命名空间
     // 枚举ws的连接状态
     enum class ws_connection_state{
         WS_DISCONNECTED, // 断开连接
@@ -59,12 +60,12 @@ using ErrorCallback = std::function<void(const std::string&)>;
         virtual ~IWebSocketEndpoint() = default; // 默认析构函数
 
         // 连接管理
-        virtual void connect() = 0; // 连接到WebSocket服务器
+        virtual bool connect(const ws_config& config) = 0; // 连接到WebSocket服务器
         virtual void disconnect() = 0; // 断开与WebSocket服务器的连接
         virtual ws_connection_state get_connection_state() const = 0; // 获取当前连接状态
 
         // 消息处理
-        virtual void send_message(const ws_message& message) = 0; // 发送消息
+        virtual bool send_message(const ws_message& message) = 0; // 发送消息
 
         // 回调设置
         virtual void set_message_callback(MessageCallback callback) = 0; // 设置消息回调

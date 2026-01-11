@@ -5,7 +5,7 @@
 #include <sstream>
 #include <mutex>
 
-namespace ws {
+namespace KK_WS {
 
 /**
  * @brief 简单的线程安全日志类
@@ -13,10 +13,10 @@ namespace ws {
 class Logger {
 public:
     enum class Level {
-        DEBUG,
-        INFO,
-        WARNING,
-        ERROR
+        Ws_DEBUG,
+        Ws_INFO,
+        Ws_WARNING,
+        Ws_ERROR
     };
 
     static void debug(const std::string& msg);

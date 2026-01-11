@@ -2,7 +2,7 @@
 #include "ws_common/logger.hpp"
 #include <algorithm>
 
-namespace ws::server {
+namespace KK_WS::server {
 
 WebSocketServer::WebSocketServer(const ServerConfig& config)
     : config_(config) {
@@ -176,4 +176,4 @@ void WebSocketServer::on_message(connection_hdl hdl, message_ptr msg) {
     }
 }
 
-} // namespace ws::server
+} // namespace KK_WS::server

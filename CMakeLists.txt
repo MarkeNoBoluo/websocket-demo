@@ -1,5 +1,15 @@
 # WebSocket Demo - 根CMake配置
 cmake_minimum_required(VERSION 3.16)
+
+# 🔧 设置CMake策略以避免警告
+if(POLICY CMP0144)
+    cmake_policy(SET CMP0144 NEW)  # 使用<PACKAGENAME>_ROOT变量
+endif()
+
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 OLD)  # 继续使用FindBoost模块
+endif()
+
 project(WebSocketDemo
     VERSION 1.0.0
     DESCRIPTION "Modular WebSocket Client/Server Demo"
@@ -20,6 +30,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 # ========== 强制指定Boost路径 ==========
+# 清除可能的CMake缓存干扰
+unset(Boost_FOUND CACHE)
+unset(Boost_INCLUDE_DIR CACHE)
+unset(Boost_LIBRARY_DIRS CACHE)
+
 set(Boost_ROOT "D:/LIB/Boost/boost_1_86_0")
 set(BOOST_ROOT "D:/LIB/Boost/boost_1_86_0")
 set(Boost_INCLUDE_DIR "D:/LIB/Boost/boost_1_86_0")
@@ -31,11 +46,23 @@ set(Boost_NO_BOOST_CMAKE ON)
 # WebSocket++路径
 set(WEBSOCKETPP_ROOT "D:/LIB/websocketpp")
 
-# 📦 查找依赖
+# 配置Boost查找选项
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.86.0 REQUIRED COMPONENTS system thread)
+set(Boost_DETAILED_FAILURE_MSG ON)
+
+find_package(Boost 1.86.0 REQUIRED
+    COMPONENTS
+        system
+        thread
+        chrono
+        date_time
+        random
+    OPTIONAL_COMPONENTS
+        context
+        filesystem
+)
 
 if(Boost_FOUND)
     message(STATUS "✓ Boost ${Boost_VERSION} 找到")
@@ -49,8 +76,8 @@ endif()
 add_subdirectory(common)      # 1. 公共基础库
 add_subdirectory(core)        # 2. WebSocket核心
 add_subdirectory(server)      # 3. 服务器程序
-# add_subdirectory(client)      # 4. 客户端库
-# add_subdirectory(console_client)  # 5. 控制台客户端
+add_subdirectory(client)      # 4. 客户端库
+add_subdirectory(console_client)  # 5. 控制台客户端
 
 # Windows平台DLL复制
 if(WIN32 AND NOT Boost_USE_STATIC_LIBS)

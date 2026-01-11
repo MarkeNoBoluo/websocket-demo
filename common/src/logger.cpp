@@ -3,17 +3,17 @@
 #include <iomanip>
 #include <ctime>
 
-namespace ws {
+namespace KK_WS {
 
 std::mutex Logger::log_mutex_;
-Logger::Level Logger::current_level_ = Level::INFO;
+Logger::Level Logger::current_level_ = Level::Ws_INFO;
 
 const char* Logger::level_to_string(Level level) {
     switch (level) {
-        case Level::DEBUG:   return "DEBUG";
-        case Level::INFO:    return "INFO";
-        case Level::WARNING: return "WARN";
-        case Level::ERROR:   return "ERROR";
+        case Level::Ws_DEBUG:   return "DEBUG";
+        case Level::Ws_INFO:    return "INFO";
+        case Level::Ws_WARNING: return "WARN";
+        case Level::Ws_ERROR:   return "ERROR";
         default:             return "UNKNOWN";
     }
 }
@@ -50,19 +50,19 @@ void Logger::log(Level level, const std::string& msg) {
 }
 
 void Logger::debug(const std::string& msg) {
-    log(Level::DEBUG, msg);
+    log(Level::Ws_DEBUG, msg);
 }
 
 void Logger::info(const std::string& msg) {
-    log(Level::INFO, msg);
+    log(Level::Ws_INFO, msg);
 }
 
 void Logger::warning(const std::string& msg) {
-    log(Level::WARNING, msg);
+    log(Level::Ws_WARNING, msg);
 }
 
 void Logger::error(const std::string& msg) {
-    log(Level::ERROR, msg);
+    log(Level::Ws_ERROR, msg);
 }
 
 void Logger::set_level(Level level) {
