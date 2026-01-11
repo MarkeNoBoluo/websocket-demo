@@ -13,7 +13,11 @@ target_include_directories(ws-common
         $<INSTALL_INTERFACE:include>
 )
 
-# 链接依赖（当前无外部依赖）
-# target_link_libraries(ws-common PUBLIC ...)
+# 设置编译选项
+if(MSVC)
+    target_compile_options(ws-common PRIVATE /W4)
+else()
+    target_compile_options(ws-common PRIVATE -Wall -Wextra)
+endif()
 
 message(STATUS "公共库配置完成: ws-common")

@@ -5,7 +5,7 @@ project(WebSocketDemo
     DESCRIPTION "Modular WebSocket Client/Server Demo"
     LANGUAGES CXX
 )
-
+ 
 # 🎯 设置C++标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -19,8 +19,31 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # 🔧 包含CMake工具脚本
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+# ========== 强制指定Boost路径 ==========
+set(Boost_ROOT "D:/LIB/Boost/boost_1_86_0")
+set(BOOST_ROOT "D:/LIB/Boost/boost_1_86_0")
+set(Boost_INCLUDE_DIR "D:/LIB/Boost/boost_1_86_0")
+set(Boost_LIBRARY_DIR "D:/LIB/Boost/boost_1_86_0/stage/lib")
+set(BOOST_LIBRARYDIR "D:/LIB/Boost/boost_1_86_0/stage/lib")
+set(Boost_NO_SYSTEM_PATHS ON)
+set(Boost_NO_BOOST_CMAKE ON)
+
+# WebSocket++路径
+set(WEBSOCKETPP_ROOT "D:/LIB/websocketpp")
+
 # 📦 查找依赖
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost 1.86.0 REQUIRED COMPONENTS system thread)
+
+if(Boost_FOUND)
+    message(STATUS "✓ Boost ${Boost_VERSION} 找到")
+    message(STATUS "  包含目录: ${Boost_INCLUDE_DIRS}")
+    message(STATUS "  库目录: ${Boost_LIBRARY_DIRS}")
+else()
+    message(FATAL_ERROR "✗ 未找到 Boost 1.86.0")
+endif()
 
 # 🏗️ 按顺序添加模块（依赖顺序很重要！）
 add_subdirectory(common)      # 1. 公共基础库
@@ -28,6 +51,20 @@ add_subdirectory(core)        # 2. WebSocket核心
 add_subdirectory(server)      # 3. 服务器程序
 # add_subdirectory(client)      # 4. 客户端库
 # add_subdirectory(console_client)  # 5. 控制台客户端
+
+# Windows平台DLL复制
+if(WIN32 AND NOT Boost_USE_STATIC_LIBS)
+    add_custom_target(copy_boost_dlls ALL
+        COMMAND ${CMAKE_COMMAND} -E echo "复制Boost DLL..."
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${Boost_LIBRARY_DIR}/boost_system-vc143-mt-x64-1_86.dll"
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${Boost_LIBRARY_DIR}/boost_thread-vc143-mt-x64-1_86.dll"
+            "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+        COMMENT "复制Boost DLL到输出目录"
+    )
+endif()
 
 # 💡 构建后信息
 message(STATUS "======================================")
